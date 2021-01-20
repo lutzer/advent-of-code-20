@@ -7,6 +7,7 @@ Problems solved in rust.
 * install rustup and cargo: https://rustup.rs/:
   * `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`
   * install cargo-edit `cargo install cargo-edit`, it allows to add dependencies with `cargo add <package>`
+  * create new project with `cargo new <project_name>`
 
 ## Build Instructions
 
