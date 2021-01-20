@@ -10,12 +10,7 @@ fn get_char_at(data : &string::String, pos : (usize,usize)) -> option::Option<ch
   return data.chars().nth(pos.0 + pos.1 * ROW_LENGTH)
 }
 
-fn part_1() {
-  println!("Reading data from file {}.", FILENAME);
-  let data = fs::read_to_string(FILENAME)
-    .unwrap()
-    .replace('\n', "");
-  
+fn traverse_tree(data : &string::String, slope : &(usize, usize)) -> i32 {
   let mut position = (0, 0);
   let mut count = 0;
 
@@ -24,25 +19,47 @@ fn part_1() {
       Some(c) => { 
         // println!("({},{}) {}", position.0, position.1, c);
         count = if c == '#' {count + 1} else { count };
-        position.0 = (position.0 + 3) % ROW_LENGTH;
-        position.1 += 1
+        position.0 = (position.0 + slope.0) % ROW_LENGTH;
+        position.1 += slope.1
       },
       None => { 
-        println!("reached end. found {} trees on the way.", count);
         break;
       }
     }
   }
+  return count;
+}
+
+fn part_1() {
+  println!("Reading data from file {}.", FILENAME);
+  let data = fs::read_to_string(FILENAME)
+    .unwrap()
+    .replace('\n', "");
+  
+    let tree_count = traverse_tree(&data, &(3, 1));
+    println!("Reached end. found {} trees on the way.", tree_count);
 }
 
 fn part_2() {
-  println!("part2");
+  println!("Reading data from file {}.", FILENAME);
+  let data = fs::read_to_string(FILENAME)
+    .unwrap()
+    .replace('\n', "");
+
+  let slopes = [(1,1), (3,1), (5,1), (7,1), (1,2)];
+
+  let tree_counts = slopes.iter().map(|slope| { traverse_tree(&data, &slope)});
+
+  let multiplied_counts = tree_counts.fold(1 as i128, |acc, val| acc * (val as i128));
+
+  println!("Multiplied tree counts: {}", multiplied_counts);
 }
 
 fn main() {
   let args = App::new("Advent of Code - Day 3")
     .arg(Arg::with_name("day")
-      .takes_value(true))
+      .takes_value(true)
+      .required(true))
     .get_matches();
 
   let day = args.value_of("day").unwrap_or("");
@@ -50,6 +67,6 @@ fn main() {
   match day {
     "1" => part_1(),
     "2" => part_2(),
-    _ => panic!("Select either part 1 or 2")
+    _ =>  eprintln!("Select either part 1 or 2")
   }
 }
