@@ -74,7 +74,7 @@ fn part_2() {
 }
 
 fn main() {
-  let args = App::new("Advent of Code - Day 4")
+  let args = App::new("Advent of Code - Day 5")
   .arg(Arg::with_name("day")
   .takes_value(true)
   .required(true))
