@@ -60,10 +60,9 @@ fn count_containing_bags(bag: String, rules: &Vec<Rule>) -> i32 {
   if contains.len() == 0 {
     return 0;
   } else {
-    let count = contains.into_iter().fold(0, |acc, c| {
+    return contains.into_iter().fold(0, |acc, c| {
       acc + c.0 + c.0 * count_containing_bags(c.1, rules)
     });
-    return count;
   }
 }
 
@@ -96,7 +95,7 @@ fn part_2() {
 
   let count = count_containing_bags(str!("shiny gold"), &rules);
 
-  println!("one shiny gold bag contains {} other bags", count);
+  println!("one shiny gold bag contains {} other bags.", count);
 }
 
 fn main() {
