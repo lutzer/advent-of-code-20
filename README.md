@@ -14,7 +14,7 @@ Problems solved in rust.
 ### build in cli
   ```
   > cargo build
-  > cargo run -- <part>
+  > cargo run <part>
   ```
 ### build using visual studio task:
   * create `.vscode/tasks.json`

@@ -75,12 +75,12 @@ fn part_2() {
 
 fn main() {
   let args = App::new("Advent of Code - Day 6")
-  .arg(Arg::with_name("day")
+  .arg(Arg::with_name("part")
   .takes_value(true)
   .required(true))
   .get_matches();
   
-  let day = args.value_of("day").unwrap_or("");
+  let part = args.value_of("part").unwrap_or("");
   
   match day {
     "1" => part_1(),

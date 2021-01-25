@@ -75,14 +75,14 @@ fn part_2() {
 
 fn main() {
   let args = App::new("Advent of Code - Day 5")
-  .arg(Arg::with_name("day")
+  .arg(Arg::with_name("part")
   .takes_value(true)
   .required(true))
   .get_matches();
   
-  let day = args.value_of("day").unwrap_or("");
+  let part = args.value_of("part").unwrap_or("");
   
-  match day {
+  match part {
     "1" => part_1(),
     "2" => part_2(),
     _ =>  eprintln!("Select either part 1 or 2")
