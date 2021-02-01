@@ -1,7 +1,7 @@
 use std::fs;
 use clap::{Arg, App};
 
-const FILENAME : &str = "input.txt";
+const FILENAME: &str = "input.txt";
 
 fn read_input() -> String {
   let data = fs::read_to_string(FILENAME).expect("Input Error");
