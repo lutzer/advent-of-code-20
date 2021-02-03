@@ -3,31 +3,28 @@ use clap::{Arg, App};
 
 const FILENAME: &str = "input.txt";
 
-fn read_input() -> String {
-  let data = fs::read_to_string(FILENAME).expect("Input Error");
-  return String::from(data.trim_end());
+fn part_1(input: &String) -> u64 {
+  return 0
 }
 
-fn part_1() {
-  let data = read_input();
-}
-
-fn part_2() {
-  let data = read_input();
+fn part_2(input: &String) -> u64 {
+  return 0
 }
 
 fn main() {
-  let args = App::new("Advent of Code - Day ?")
+  let args = App::new("Advent of Code - Day 15")
   .arg(Arg::with_name("part")
   .takes_value(true)
   .required(true))
   .get_matches();
   
+  let data = fs::read_to_string(FILENAME).expect("Input Error");
+
   let part = args.value_of("part").unwrap_or("");
-  
-  match part {
-    "1" => part_1(),
-    "2" => part_2(),
-    _ =>  eprintln!("Select either part 1 or 2")
-  }
+  let result = match part {
+    "1" => { part_1(&data.trim_end().to_string()) },
+    "2" => { part_2(&data.trim_end().to_string()) },
+    _ => { panic!("Select either part 1 or 2") }
+  };
+  println!("Result is: {}", result);
 }
