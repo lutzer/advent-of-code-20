@@ -1,4 +1,3 @@
-use std::fs;
 use std::collections::HashMap;
 use clap::{Arg, App};
 
@@ -10,18 +9,15 @@ fn part_1(input: &Vec<u64>) -> u64 {
   let mut last_spoken = *input.last().unwrap();
   
   for _ in turn..2020 {
-    match &spoken.get(&last_spoken) {
-      Some(&x) => {
-        spoken.insert(last_spoken, turn);
+    match spoken.insert(last_spoken, turn) {
+      Some(x) => {
         last_spoken = turn - x;
       },
       None => {
-        spoken.insert(last_spoken, turn);
         last_spoken = 0;
       }
     }
     turn += 1;
-    //println!("turn: {}, spoken: {}={:?}", turn, last_spoken, spoken);
   }
 
   return last_spoken;
@@ -35,13 +31,11 @@ fn part_2(input: &Vec<u64>) -> u64 {
   let mut last_spoken = *input.last().unwrap();
   
   for _ in turn..30000000 {
-    match &spoken.get(&last_spoken) {
-      Some(&x) => {
-        spoken.insert(last_spoken, turn);
+    match spoken.insert(last_spoken, turn) {
+      Some(x) => {
         last_spoken = turn - x;
       },
       None => {
-        spoken.insert(last_spoken, turn);
         last_spoken = 0;
       }
     }
