@@ -59,6 +59,16 @@ fn part_1(input: &String) -> u64 {
 }
 
 fn part_2(input: &String) -> u64 {
+
+  fn is_ticket_valid(ticket: &Ticket, fields: &Vec<u32>) -> bool {
+    return ticket.iter().any(|&value| {
+      let valid = fields.chunks(2).any(|f| {
+        return value >= f[0] && value <= f[1];
+      });
+      return !valid;
+    }) == false
+  }
+
   let (fields, your_ticket, nearby_tickets) = parse_data(input);
 
   let all_fields = fields.iter().fold(vec![] as Vec<u32>, |mut acc, f| {
@@ -67,12 +77,7 @@ fn part_2(input: &String) -> u64 {
   });
 
   let valid_tickets: Vec<Ticket> = nearby_tickets.into_iter().filter(|t| {
-    return t.iter().any(|&value| {
-      let valid = all_fields.chunks(2).any(|f| {
-        return value >= f[0] && value <= f[1];
-      });
-      return !valid;
-    }) == false
+    return is_ticket_valid(t, &all_fields);
   }).collect();
 
   // find out possible indices for fields
@@ -124,7 +129,7 @@ fn part_2(input: &String) -> u64 {
 }
 
 fn main() {
-  let args = App::new("Advent of Code - Day 15")
+  let args = App::new("Advent of Code - Day 16")
   .arg(Arg::with_name("part")
   .takes_value(true)
   .required(true))
