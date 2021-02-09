@@ -4,10 +4,19 @@ use std::collections::HashMap;
 
 const FILENAME: &str = "input.txt";
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 struct Cube {
-  position: [i32; 3],
+  position: Vec<i32>,
   active: bool
+}
+
+impl Clone for Cube {
+  fn clone(&self) -> Cube {
+      return Cube{
+        position: self.position.clone(),
+        active: self.active
+      }
+  }
 }
 
 impl Cube {
@@ -22,16 +31,11 @@ impl Cube {
   }
 }
 
-struct Cube4D {
-  position: [i32; 4],
-  active: bool
-}
-
-fn print_map(cubes: &Vec<Cube>, width: u32, height: u32, start: (i32, i32, i32)) {
+fn print_map(cubes: &Vec<Cube>, width: u32, height: u32, start: &[i32]) {
   for y in 0..height {
     println!();
     for x in 0..width {
-      if cubes.iter().any(|&c| { c.is_in_position(&[start.0 + x as i32, start.1 + y as i32, start.2]) }) {
+      if cubes.iter().any(|c| { c.is_in_position(start) }) {
         print!("#");
       } else {
         print!(".");
@@ -47,7 +51,7 @@ fn get_neighbours<'a>(center: &Cube, cubes: &Vec<Cube>) -> Vec<Cube> {
     let y = (i / 3) % 3 - 1 + center.position[1];
     let z = i / (3*3) - 1 + center.position[2];
     return Cube {
-      position: [x, y, z],
+      position: vec![x, y, z],
       active: cubes.iter().any(|c| { c.is_in_position(&[x,y,z]) })
     };
   }).collect();
@@ -61,7 +65,7 @@ fn part_1(input: &String) -> u64 {
     }
     if c == '#' {
       cubes.push(Cube{
-        position: [i, j, 0],
+        position: vec![i, j, 0],
         active: true
       });
     }
@@ -71,7 +75,7 @@ fn part_1(input: &String) -> u64 {
   for _ in 0..6 {
     // insert all neighbours of active cubes and count number of active neighbours
     let check_cubes: HashMap<String,(u32, Cube)> = active_cubes.iter().fold(HashMap::new(),|mut map, cube| {
-      map.entry(cube.get_hash()).or_insert((0, *cube));
+      map.entry(cube.get_hash()).or_insert((0, cube.clone()));
       let neighbours = get_neighbours(cube, &active_cubes);
       for n in neighbours {
         let hash = n.get_hash();
@@ -83,9 +87,9 @@ fn part_1(input: &String) -> u64 {
     // set active cubes
     active_cubes = check_cubes.iter().fold(vec![],|mut acc, (_,(count, cube))| {
       if cube.active && *count == 2 || *count == 3 {
-        acc.push(Cube{ position: cube.position, active: true});
+        acc.push(Cube{ position: cube.position.clone(), active: true});
       } else if !cube.active && *count == 3 {
-        acc.push(Cube{ position: cube.position, active: true });
+        acc.push(Cube{ position: cube.position.clone(), active: true });
       } 
       return acc;
     });
@@ -101,8 +105,8 @@ fn part_2(input: &String) -> u64 {
       return (cubes, 0, j+1);
     }
     if c == '#' {
-      cubes.push(Cube4D{
-        position: [i, j, 0, 0],
+      cubes.push(Cube{
+        position: vec![i, j, 0, 0],
         active: true
       });
     }
