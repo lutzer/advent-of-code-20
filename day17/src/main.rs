@@ -27,34 +27,35 @@ impl Cube {
   }
 
   fn get_hash(&self) -> String {
-    return format!("{}:{}:{}", self.position[0], self.position[1], self.position[2]);
+    return format!("{:?}", self.position);
   }
 }
 
-fn print_map(cubes: &Vec<Cube>, width: u32, height: u32, start: &[i32]) {
-  for y in 0..height {
-    println!();
-    for x in 0..width {
-      if cubes.iter().any(|c| { c.is_in_position(start) }) {
-        print!("#");
-      } else {
-        print!(".");
-      }
-    }
-  }
-  println!();
-}
+// fn print_map(cubes: &Vec<Cube>, width: u32, height: u32, start: &[i32]) {
+//   for y in 0..height {
+//     println!();
+//     for x in 0..width {
+//       if cubes.iter().any(|c| { c.is_in_position(start) }) {
+//         print!("#");
+//       } else {
+//         print!(".");
+//       }
+//     }
+//   }
+//   println!();
+// }
 
 fn get_neighbours<'a>(center: &Cube, cubes: &Vec<Cube>) -> Vec<Cube> {
-  return (0..27).filter(|&i| { i != 13 }).map(|i| {
-    let x = i % 3 - 1 + center.position[0];
-    let y = (i / 3) % 3 - 1 + center.position[1];
-    let z = i / (3*3) - 1 + center.position[2];
+  let dims = center.position.len() as u32;
+  return (0..i32::pow(3, dims)).map(|i| {
+    let coords: Vec<i32> = (0..dims).map(|d| {
+      return i as i32/i32::pow(3,d) % 3 - 1 + center.position[d as usize];
+    }).collect();
     return Cube {
-      position: vec![x, y, z],
-      active: cubes.iter().any(|c| { c.is_in_position(&[x,y,z]) })
+        position: coords.clone(),
+        active: cubes.iter().any(|c| { c.is_in_position(&coords) })
     };
-  }).collect();
+  }).filter(|c| { !center.is_in_position(&c.position) }).collect();
 }
 
 fn part_1(input: &String) -> u64 {
@@ -86,7 +87,7 @@ fn part_1(input: &String) -> u64 {
 
     // set active cubes
     active_cubes = check_cubes.iter().fold(vec![],|mut acc, (_,(count, cube))| {
-      if cube.active && *count == 2 || *count == 3 {
+      if cube.active && (*count == 2 || *count == 3) {
         acc.push(Cube{ position: cube.position.clone(), active: true});
       } else if !cube.active && *count == 3 {
         acc.push(Cube{ position: cube.position.clone(), active: true });
@@ -113,7 +114,30 @@ fn part_2(input: &String) -> u64 {
     return (cubes, i+1, j);
   });
 
-  return 0
+  for _ in 0..6 {
+    // insert all neighbours of active cubes and count number of active neighbours
+    let check_cubes: HashMap<String,(u32, Cube)> = active_cubes.iter().fold(HashMap::new(),|mut map, cube| {
+      map.entry(cube.get_hash()).or_insert((0, cube.clone()));
+      let neighbours = get_neighbours(cube, &active_cubes);
+      for n in neighbours {
+        let hash = n.get_hash();
+        map.entry(hash).or_insert((0, n)).0 += 1;
+      }
+      return map;
+    });
+
+    // set active cubes
+    active_cubes = check_cubes.iter().fold(vec![],|mut acc, (_,(count, cube))| {
+      if cube.active && (*count == 2 || *count == 3) {
+        acc.push(Cube{ position: cube.position.clone(), active: true});
+      } else if !cube.active && *count == 3 {
+        acc.push(Cube{ position: cube.position.clone(), active: true });
+      } 
+      return acc;
+    });
+  }  
+
+  return active_cubes.len() as u64;
 }
 
 fn main() {
