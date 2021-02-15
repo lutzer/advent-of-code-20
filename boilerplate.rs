@@ -28,3 +28,32 @@ fn main() {
   };
   println!("Result is: {}", result);
 }
+
+// run with cargo test -- --nocapture to show print output
+#[cfg(test)]
+mod tests {
+  use super::*;
+  use indoc::indoc;
+
+  #[test]
+  fn test_1() {
+    let input = String::from(indoc! {"
+      .#.
+      ..#
+      ###
+    "});
+    let result = part_1(&input);
+    assert_eq!(result, 112);
+  }
+
+  #[test]
+  fn test_2() {
+    let input = String::from(indoc! {"
+      .#.
+      ..#
+      ###
+    "});
+    let result = part_2(&input);
+    assert_eq!(result, 848);
+  }
+}
