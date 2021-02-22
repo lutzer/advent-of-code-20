@@ -12,6 +12,7 @@ type RuleMap = std::collections::HashMap<String, std::vec::Vec<String>>;
 fn match_rule(message: &str, rule_key: String, rule_map: &RuleMap) -> (bool, usize) {
   let rules = rule_map.get(&rule_key[..]).expect("Did not find rule");
   let mut steps = 0;
+  println!("{} {}:{:?}",message, rule_key, rules);
   let is_match = rules.iter().any(|rule| {
     steps = 0;
     if rule.starts_with("\"") {
@@ -39,7 +40,7 @@ fn part_1(input: &String) -> u64 {
   let messages: Vec<String> = input.split("\n\n").nth(1).unwrap().lines().map(|l| { [l,"$"].concat() }).collect();
 
   // add end char $ to rules
-  rules.insert("$".to_string(),vec!["\"$\"".to_string()]);
+  rules.insert("$".to_string(),vec![str!("\"$\"")]);
   *rules.get_mut(&str!("0")).unwrap() = rules.get(&str!("0")).unwrap().iter().map(|x| { format!("{} $",x) }).collect();
 
   let result = messages.iter().filter(|m| {
@@ -69,6 +70,7 @@ fn part_2(input: &String) -> u64 {
 
   let result = messages.iter().filter(|m| {
     let (is_match,_) = match_rule(m, "0".to_string(), &rules);
+    println!("{}",is_match);
     return is_match;
   }).count();
 
@@ -106,13 +108,20 @@ mod tests {
   }
 
   #[test]
-  fn test2() {
-    // let input = String::from(indoc! {"
-    //   .#.
-    //   ..#
-    //   ###
-    // "});
-    // let result = part_2(&input);
-    // assert_eq!(result, 848);
+  fn test2_1() {
+    let data = fs::read_to_string("test-input3.txt").expect("Input Error");
+    // let result = part_1(&data.trim_end().to_string());
+    // assert_eq!(result, 3);
+    let result = part_2(&data.trim_end().to_string());
+    assert_eq!(result, 1);
+  }
+
+  #[test]
+  fn test2_2() {
+    let data = fs::read_to_string("test-input2.txt").expect("Input Error");
+    let result = part_1(&data.trim_end().to_string());
+    assert_eq!(result, 3);
+    let result = part_2(&data.trim_end().to_string());
+    assert_eq!(result, 12);
   }
 }
