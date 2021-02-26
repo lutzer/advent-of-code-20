@@ -2,17 +2,16 @@ use std::fs;
 use clap::{Arg, App};
 use std::collections::HashMap;
 use str_macro::str;
+use itertools::Itertools;
 
 const FILENAME: &str = "input.txt";
 
 type RuleMap = std::collections::HashMap<String, std::vec::Vec<String>>;
 
-
-
 fn match_rule(message: &str, rule_key: String, rule_map: &RuleMap) -> (bool, usize) {
   let rules = rule_map.get(&rule_key[..]).expect("Did not find rule");
   let mut steps = 0;
-  println!("{} {}:{:?}",message, rule_key, rules);
+  println!("{}:{} {}:{:?}", message.len(), message, rule_key, rules);
   let is_match = rules.iter().any(|rule| {
     steps = 0;
     if rule.starts_with("\"") {
@@ -27,6 +26,21 @@ fn match_rule(message: &str, rule_key: String, rule_map: &RuleMap) -> (bool, usi
     }
   });
   return (is_match, steps);
+}
+
+// [42, 11], [42, 42, 11], [] 
+fn replace_in_rule(key: &String, rules: &Vec<String>) -> Vec<String> {
+  let key_w = &format!(" {} ", &key[..]);
+  return rules.iter().enumerate().fold(vec![], |mut acc, (i,x)| {
+    acc.push(x.clone());
+    let pattern = format!(" {} ", x);
+    if pattern.contains(key_w) {
+      for y in rules.iter() {
+        acc.push(pattern.replace(key_w, &format!(" {} ", y)).trim().to_string());
+      }
+    }
+    return acc.into_iter().unique().collect();
+  });
 }
 
 fn part_1(input: &String) -> u64 {
@@ -67,6 +81,17 @@ fn part_2(input: &String) -> u64 {
   //change rule 8 and 42
   *rules.get_mut(&str!("8")).unwrap() = vec![str!("42"), str!("42 8")];
   *rules.get_mut(&str!("11")).unwrap() = vec![str!("42 31"), str!("42 11 31")];
+  // *rules.get_mut(&str!("8")).unwrap() = (0..4).into_iter().fold(vec![str!("42"), str!("42 8")], |acc, _| {
+  //   return replace_in_rule(&str!("8"), &acc);
+  // }).iter().map(|x| {
+  //   return x.replace("8","42");
+  // }).collect();
+
+  // *rules.get_mut(&str!("11")).unwrap() = (0..4).into_iter().fold(vec![str!("42 31"), str!("42 11 31")], |acc, _| {
+  //   return replace_in_rule(&str!("11"), &acc);
+  // }).iter().map(|x| {
+  //   return x.replace("11","42 31");
+  // }).collect();
 
   let result = messages.iter().filter(|m| {
     let (is_match,_) = match_rule(m, "0".to_string(), &rules);
@@ -109,18 +134,22 @@ mod tests {
 
   #[test]
   fn test2_1() {
+    let rule = (0..1).into_iter().fold(vec![str!("42"), str!("42 8")], |acc, _| {
+      return replace_in_rule(&str!("8"), &acc);
+    });
+    assert_eq!(rule, vec!["42", "42 8", "42 42", "42 42 8"]);
+  }
+
+  #[test]
+  fn test2_2() {
     let data = fs::read_to_string("test-input3.txt").expect("Input Error");
-    // let result = part_1(&data.trim_end().to_string());
-    // assert_eq!(result, 3);
     let result = part_2(&data.trim_end().to_string());
     assert_eq!(result, 1);
   }
 
   #[test]
-  fn test2_2() {
+  fn test2_3() {
     let data = fs::read_to_string("test-input2.txt").expect("Input Error");
-    let result = part_1(&data.trim_end().to_string());
-    assert_eq!(result, 3);
     let result = part_2(&data.trim_end().to_string());
     assert_eq!(result, 12);
   }
